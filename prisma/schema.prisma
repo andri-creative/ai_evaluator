@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Document {
+  id          String          @id @default(uuid())
+  type        String
+  filename    String
+  file_path   String
+  uploaded_at DateTime        @default(now())
+  jobs_cv     EvaluationJob[] @relation("cvDocument")
+  jobs_report EvaluationJob[] @relation("reportDocument")
+}
+
+model EvaluationJob {
+  id                String            @id @default(uuid())
+  job_title         String
+  cv_id             String
+  project_report_id String
+  status            String            @default("queued")
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+  cvDocument        Document          @relation("cvDocument", fields: [cv_id], references: [id])
+  reportDocument    Document          @relation("reportDocument", fields: [project_report_id], references: [id])
+  result            EvaluationResult?
+  logs              EvaluationLog[]
+}
+
+model EvaluationResult {
+  id               String        @id @default(uuid())
+  job_id           String        @unique
+  cv_match_rate    Float
+  final_score      Float?
+  cv_feedback      String?
+  project_score    Float
+  project_feedback String?
+  overall_summary  String?
+  completed_at     DateTime      @default(now())
+  job              EvaluationJob @relation(fields: [job_id], references: [id])
+}
+
+model EvaluationLog {
+  id          String        @id @default(uuid())
+  job_id      String
+  stage       String
+  message     String
+  retry_count Int?
+  timestamp   DateTime      @default(now())
+  job         EvaluationJob @relation(fields: [job_id], references: [id])
+}
