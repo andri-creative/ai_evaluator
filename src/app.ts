@@ -26,8 +26,8 @@ app.get("/", (req, res) => {
     success: true,
     message: "CV Ai Evaluator! 🚀",
     data: {
-      app: "Express + TypeScript + Prisma",
-      version: "1.0.0",
+      app: "Express + TypeScript + Prisma + PostgreSQL",
+      version: "2.0.0",
     },
   });
 });
